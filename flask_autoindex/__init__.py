@@ -1,7 +1,7 @@
 import os
 import re
 
-from flask import *
+from quart import *
 from flask_silk import Silk
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.utils import cached_property
@@ -46,12 +46,12 @@ class AutoIndex:
                                template_folder=template_folder)
 
             @shared.route('/__autoindex__/<path:filename>')
-            def static(filename):
-                return send_from_directory(static_folder, filename)
+            async def static(filename):
+                return await send_from_directory(static_folder, filename)
             app.register_blueprint(shared)
 
     def __new__(cls, base, *args, **kwargs):
-        if isinstance(base, Flask):
+        if isinstance(base, Quart):
             return object.__new__(AutoIndexApplication)
         elif isinstance(base, Blueprint):
             return object.__new__(AutoIndexBlueprint)
@@ -79,10 +79,10 @@ class AutoIndex:
         if add_url_rules:
             @self.base.route('/')
             @self.base.route('/<path:path>')
-            def autoindex(path='.'):
-                return self.render_autoindex(path, sort_by=sort_by, order=order)
+            async def autoindex(path='.'):
+                return await self.render_autoindex(path, sort_by=sort_by, order=order)
 
-    def render_autoindex(self, path, browse_root=None, template=None,
+    async def render_autoindex(self, path, browse_root=None, template=None,
                          template_context=None, endpoint='.autoindex',
                          show_hidden=None, sort_by='name', order=1,
                          mimetype=None):
@@ -136,13 +136,13 @@ class AutoIndex:
                 curdir=curdir, entries=entries,
                 sort_by=sort_by, order=order, endpoint=endpoint)
             if template:
-                return render_template(template, **context)
+                return await render_template(template, **context)
             try:
                 template = '{0}autoindex.html'.format(self.template_prefix)
-                return render_template(template, **context)
+                return await render_template(template, **context)
             except TemplateNotFound as e:
                 template = '{0}/autoindex.html'.format(__autoindex__)
-                return render_template(template, **context)
+                return await render_template(template, **context)
         elif os.path.isfile(abspath):
             if mimetype:
                 return send_file(abspath, mimetype=mimetype)
