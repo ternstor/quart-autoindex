@@ -10,7 +10,7 @@ import os
 import re
 from future.utils import with_metaclass
 from future.moves.urllib.parse import urljoin
-from flask import url_for, send_file
+from quart import url_for, send_file
 from werkzeug.utils import cached_property
 
 
