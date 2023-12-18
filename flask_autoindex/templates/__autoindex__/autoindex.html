@@ -35,10 +35,6 @@
     </table>
   {% endblock %}
   {% block footer %}
-    {% set env = request.environ %}
-    <address>{{ env.SERVER_SOFTWARE }}
-      Server at {{ env.HTTP_HOST }}
-      Port {{ env.SERVER_PORT }}</address>
   {% endblock %}
 </body>
 </html>
